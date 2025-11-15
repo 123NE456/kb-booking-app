@@ -225,195 +225,195 @@ https://templatemo.com/tm-546-sixteen-clothing
 
 
 
-
-
-
-
-
-
-
 <script>
-// ===============================
-//        CONFIG SALON
-// ===============================
-const OPENING_SLOTS = ["08:00", "09:00", "10:00", "11:00", "15:00", "16:00", "17:00"];
-const CLOSED_DAY = 0; // Dimanche
+document.addEventListener("DOMContentLoaded", () => {
+  // ===============================
+  //        CONFIG SALON
+  // ===============================
+  const OPENING_SLOTS = ["08:00", "09:00", "10:00", "11:00", "15:00", "16:00", "17:00"];
+  const CLOSED_DAY = 0; // Dimanche
 
-// ===============================
-//     SELECTEURS IMPORTANTS
-// ===============================
-const productGrid = document.getElementById("product-grid");
-const pagination = document.getElementById("pagination");
-const reservationForm = document.getElementById("reservation-form");
-const productSelect = document.getElementById("product");
-const dateInput = document.getElementById("date");
-const timeSelect = document.getElementById("time");
+  // ===============================
+  //     SELECTEURS IMPORTANTS
+  // ===============================
+  const productGrid = document.getElementById("product-grid");
+  const pagination = document.getElementById("pagination");
+  const reservationForm = document.getElementById("reservation-form");
+  const productSelect = document.getElementById("product");
+  const dateInput = document.getElementById("date");
+  const timeSelect = document.getElementById("time");
 
-// ===============================
-//       PRODUITS DU SALON
-// ===============================
-const productsData = {
-  1: [
-    { name: "Coiffure 1", price: "$18.25", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_01.jpg", reviews: 12, category: "des" },
-    { name: "Coiffure 2", price: "$16.75", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_02.jpg", reviews: 24, category: "dev" }
-  ],
-  2: [
-    { name: "Coiffure 3", price: "$32.50", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_03.jpg", reviews: 36, category: "gra" },
-    { name: "Coiffure 4", price: "$24.60", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_04.jpg", reviews: 48, category: "gra" }
-  ],
-  3: [
-    { name: "Coiffure 5", price: "$20.00", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_05.jpg", reviews: 15, category: "dev" },
-    { name: "Coiffure 6", price: "$22.50", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_06.jpg", reviews: 18, category: "des" }
-  ],
-  4: [
-    { name: "Coiffure 7", price: "$30.00", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_07.jpg", reviews: 20, category: "gra" },
-    { name: "Coiffure 8", price: "$25.50", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_08.jpg", reviews: 10, category: "dev" }
-  ]
-};
+  // ===============================
+  //       PRODUITS DU SALON
+  // ===============================
+  const productsData = {
+    1: [
+      { name: "Coiffure 1", price: "$18.25", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_01.jpg", reviews: 12, category: "des" },
+      { name: "Coiffure 2", price: "$16.75", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_02.jpg", reviews: 24, category: "dev" }
+    ],
+    2: [
+      { name: "Coiffure 3", price: "$32.50", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_03.jpg", reviews: 36, category: "gra" },
+      { name: "Coiffure 4", price: "$24.60", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_04.jpg", reviews: 48, category: "gra" }
+    ],
+    3: [
+      { name: "Coiffure 5", price: "$20.00", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_05.jpg", reviews: 15, category: "dev" },
+      { name: "Coiffure 6", price: "$22.50", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_06.jpg", reviews: 18, category: "des" }
+    ],
+    4: [
+      { name: "Coiffure 7", price: "$30.00", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_07.jpg", reviews: 20, category: "gra" },
+      { name: "Coiffure 8", price: "$25.50", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_08.jpg", reviews: 10, category: "dev" }
+    ]
+  };
 
-// ===============================
-//   REMPLIR SELECT COIFFURES
-// ===============================
-(function fillProducts() {
-  if (!productSelect) return;
-  productSelect.innerHTML = `<option value="">-- Sélectionnez une coiffure --</option>`;
-  Object.values(productsData).flat().forEach(prod => {
-    const option = document.createElement("option");
-    option.value = prod.name;
-    option.textContent = prod.name;
-    productSelect.appendChild(option);
-  });
-})();
+  // ===============================
+  //   REMPLIR SELECT COIFFURES
+  // ===============================
+  (function fillProducts() {
+    if (!productSelect) return;
+    productSelect.innerHTML = `<option value="">-- Sélectionnez une coiffure --</option>`;
+    Object.values(productsData).flat().forEach(prod => {
+      const option = document.createElement("option");
+      option.value = prod.name;
+      option.textContent = prod.name;
+      productSelect.appendChild(option);
+    });
+  })();
 
-// ===============================
-//       AFFICHAGE PRODUITS
-// ===============================
-function showProducts(products) {
-  if (!productGrid) return;
-  productGrid.innerHTML = "";
-  products.forEach(prod => {
-    const div = document.createElement("div");
-    div.className = `col-lg-4 col-md-4 all ${prod.category}`;
-    div.innerHTML = `
-      <div class="product-item">
-        <a href="#"><img src="${prod.img}" alt="${prod.name}"></a>
-        <div class="down-content">
-          <a href="#"><h4>${prod.name}</h4></a>
-          <h6>${prod.price}</h6>
-          <p>${prod.desc}</p>
-          <ul class="stars">
-            <li><i class="fa fa-star"></i></li>
-            <li><i class="fa fa-star"></i></li>
-            <li><i class="fa fa-star"></i></li>
-            <li><i class="fa fa-star"></i></li>
-            <li><i class="fa fa-star"></i></li>
-          </ul>
-          <span>Reviews (${prod.reviews})</span>
-          <button class="btn btn-primary btn-sm reserve-btn" data-product="${prod.name}">
-            Réserver
-          </button>
+  // ===============================
+  //       AFFICHAGE PRODUITS
+  // ===============================
+  function showProducts(products) {
+    if (!productGrid) return;
+    productGrid.innerHTML = "";
+    products.forEach(prod => {
+      const div = document.createElement("div");
+      div.className = `col-lg-4 col-md-4 all ${prod.category}`;
+      div.innerHTML = `
+        <div class="product-item">
+          <a href="#"><img src="${prod.img}" alt="${prod.name}"></a>
+          <div class="down-content">
+            <a href="#"><h4>${prod.name}</h4></a>
+            <h6>${prod.price}</h6>
+            <p>${prod.desc}</p>
+            <ul class="stars">
+              <li><i class="fa fa-star"></i></li>
+              <li><i class="fa fa-star"></i></li>
+              <li><i class="fa fa-star"></i></li>
+              <li><i class="fa fa-star"></i></li>
+              <li><i class="fa fa-star"></i></li>
+            </ul>
+            <span>Reviews (${prod.reviews})</span>
+            <button class="btn btn-primary btn-sm reserve-btn" data-product="${prod.name}">
+              Réserver
+            </button>
+          </div>
         </div>
-      </div>
-    `;
-    productGrid.appendChild(div);
-  });
-}
+      `;
+      productGrid.appendChild(div);
+    });
+  }
 
-// ===============================
-//          PAGINATION
-// ===============================
-let currentPage = 1;
-function initPagination() {
-  if (!pagination) return;
-  pagination.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", e => {
-      e.preventDefault();
-      const page = parseInt(link.getAttribute("data-page"));
-      if (productsData[page]) {
-        currentPage = page;
-        showProducts(productsData[page]);
-        setActivePage(page);
+  // ===============================
+  //          PAGINATION
+  // ===============================
+  let currentPage = 1;
+  function initPagination() {
+    if (!pagination) return;
+    pagination.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const page = parseInt(link.getAttribute("data-page"));
+        if (productsData[page]) {
+          currentPage = page;
+          showProducts(productsData[page]);
+          setActivePage(page);
+        }
+      });
+    });
+  }
+  function setActivePage(pageNum) {
+    if (!pagination) return;
+    pagination.querySelectorAll("li").forEach(li => li.classList.remove("active"));
+    const link = pagination.querySelector(`a[data-page='${pageNum}']`);
+    if (link) link.parentElement.classList.add("active");
+  }
+
+  showProducts(productsData[currentPage]);
+  setActivePage(currentPage);
+  initPagination();
+
+  // ===============================
+  //   AUTO-REMPLIR COIFFURE
+  // ===============================
+  if (productGrid) {
+    productGrid.addEventListener("click", e => {
+      if (e.target.classList.contains("reserve-btn")) {
+        productSelect.value = e.target.dataset.product;
+        if (reservationForm) reservationForm.scrollIntoView({ behavior: "smooth" });
       }
     });
-  });
-}
-function setActivePage(pageNum) {
-  if (!pagination) return;
-  pagination.querySelectorAll("li").forEach(li => li.classList.remove("active"));
-  const link = pagination.querySelector(`a[data-page='${pageNum}']`);
-  if (link) link.parentElement.classList.add("active");
-}
-showProducts(productsData[currentPage]);
-setActivePage(currentPage);
-initPagination();
-
-// ===============================
-//   AUTO-REMPLIR COIFFURE
-// ===============================
-productGrid.addEventListener("click", e => {
-  if (e.target.classList.contains("reserve-btn")) {
-    productSelect.value = e.target.dataset.product;
-    reservationForm.scrollIntoView({ behavior: "smooth" });
   }
-});
 
-// ===============================
-//    GÉNÉRER CRÉNEAUX HORAIRES
-// ===============================
-function refreshTimeSlots() {
-  if (!timeSelect) return;
-  timeSelect.innerHTML = `<option value="">-- Choisissez une heure --</option>`;
-  OPENING_SLOTS.forEach(slot => {
-    const o = document.createElement("option");
-    o.value = slot;
-    o.textContent = slot;
-    timeSelect.appendChild(o);
-  });
-}
-refreshTimeSlots();
-
-// ===============================
-//  INTERDICTION DIMANCHE + PASSÉ
-// ===============================
-dateInput.addEventListener("change", () => {
-  const selected = new Date(dateInput.value);
-  const today = new Date();
-  selected.setHours(0,0,0,0); today.setHours(0,0,0,0);
-
-  if (selected < today) {
-    alert("❌ Impossible de réserver une date passée.");
-    dateInput.value = "";
-    return;
+  // ===============================
+  //    GÉNÉRER CRÉNEAUX HORAIRES
+  // ===============================
+  function refreshTimeSlots() {
+    if (!timeSelect) return;
+    timeSelect.innerHTML = `<option value="">-- Choisissez une heure --</option>`;
+    OPENING_SLOTS.forEach(slot => {
+      const o = document.createElement("option");
+      o.value = slot;
+      o.textContent = slot;
+      timeSelect.appendChild(o);
+    });
   }
-  if (selected.getDay() === CLOSED_DAY) {
-    alert("❌ Le salon est fermé le dimanche.");
-    dateInput.value = "";
-    return;
-  }
-});
+  refreshTimeSlots();
 
-// ===============================
-//      ENVOI FORMULAIRE
-// ===============================
-reservationForm.addEventListener("submit", e => {
-  e.preventDefault();
-  const formData = new FormData(reservationForm);
+  // ===============================
+  //  INTERDICTION DIMANCHE + PASSÉ
+  // ===============================
+  if (dateInput) {
+    dateInput.addEventListener("change", () => {
+      const selected = new Date(dateInput.value);
+      const today = new Date();
+      selected.setHours(0,0,0,0); today.setHours(0,0,0,0);
 
-  fetch("/book", { method: "POST", body: formData })
-    .then(res => res.json())
-    .then(data => {
-      if (!data.success) alert("❌ " + data.error);
-      else {
-        alert("✅ " + data.message);
-        reservationForm.reset();
-        refreshTimeSlots();
+      if (selected < today) {
+        alert("❌ Impossible de réserver une date passée.");
+        dateInput.value = "";
+        return;
       }
-    })
-    .catch(err => { console.error(err); alert("Erreur lors de la réservation ❌"); });
+      if (selected.getDay() === CLOSED_DAY) {
+        alert("❌ Le salon est fermé le dimanche.");
+        dateInput.value = "";
+        return;
+      }
+    });
+  }
+
+  // ===============================
+  //      ENVOI FORMULAIRE
+  // ===============================
+  if (reservationForm) {
+    reservationForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = new FormData(reservationForm);
+
+      fetch("/book", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) alert("❌ " + data.error);
+          else {
+            alert("✅ " + data.message);
+            reservationForm.reset();
+            refreshTimeSlots();
+          }
+        })
+        .catch(err => { console.error(err); alert("Erreur lors de la réservation ❌"); });
+    });
+  }
 });
 </script>
-
-
 
 
 
