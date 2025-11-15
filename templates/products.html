@@ -143,6 +143,7 @@ https://templatemo.com/tm-546-sixteen-clothing
 
 
 
+
 <!-- Reservation Form Section -->
 <div class="reservation-form" style="margin-top:50px; margin-bottom:50px;">
   <div class="container">
@@ -153,29 +154,56 @@ https://templatemo.com/tm-546-sixteen-clothing
         </div>
       </div>
       <div class="col-md-8 offset-md-2">
-        <form action="/book" method="POST" id="reservation-form">
-          <div class="form-group">
-            <label for="name">Nom complet:</label>
-            <input type="text" id="name" name="name" class="form-control" placeholder="Votre nom" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">Téléphone:</label>
-            <input type="text" id="phone" name="phone" class="form-control" placeholder="+1 555 555 5555" required>
-          </div>
-          <div class="form-group">
-            <label for="product">Choix de la coiffure:</label>
+
+      <form action="/book" method="POST" id="reservation-form">
+        <div class="form-group">
+          <label for="name">Nom complet:</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Votre nom" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Téléphone:</label>
+          <input type="text" id="phone" name="phone" class="form-control" placeholder="+1 555 555 5555" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" name="email" class="form-control" required placeholder="Votre email">
+        </div>
+
+        <div class="form-group">
+          <label for="product">Choix de la coiffure:</label>
+          <select id="product" name="hairstyle" class="form-control" required>
+            <option value="">-- Sélectionnez une coiffure --</option>
+            <option value="Tresses simples">Tresses simples</option>
+            <option value="Coiffure afro">Coiffure afro</option>
+            <option value="Tissage">Tissage</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="date">Date souhaitée:</label>
+          <input type="date" id="date" name="date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="time">Horaire:</label>
+          <select id="time" name="time" class="form-control" required>
+            <option value="">-- Sélectionnez un créneau --</option>
+            <option value="09:00-10:00">09:00 - 10:00</option>
+            <option value="10:00-11:00">10:00 - 11:00</option>
+            <option value="11:00-12:00">11:00 - 12:00</option>
+            <option value="13:00-14:00">13:00 - 14:00</option>
+            <option value="14:00-15:00">14:00 - 15:00</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Réserver maintenant</button>
+      </form>
 
 
-            <select id="product" name="hairstyle" class="form-control" required>
-              <option value="">-- Sélectionnez une coiffure --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="date">Date souhaitée:</label>
-            <input type="date" id="date" name="date" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Réserver maintenant</button>
-        </form>
+
+
       </div>
     </div>
   </div>
@@ -187,14 +215,43 @@ https://templatemo.com/tm-546-sixteen-clothing
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
-// ======= Sélecteurs =======
+// ===============================
+//        CONFIG SALON
+// ===============================
+const OPENING_SLOTS = ["08:00", "09:00", "10:00", "11:00", "15:00", "16:00", "17:00"];
+const CLOSED_DAY = 0; // Dimanche
+
+// ===============================
+//     SELECTEURS IMPORTANTS
+// ===============================
 const productGrid = document.getElementById("product-grid");
 const pagination = document.getElementById("pagination");
-const reservationForm = document.getElementById('reservation-form');
-const productSelect = document.getElementById('product'); // doit matcher le <select name="product">
+const reservationForm = document.getElementById("reservation-form");
+const productSelect = document.getElementById("product");
+const dateInput = document.getElementById("date");
+const timeSelect = document.getElementById("time");
 
-// ======= Données produits =======
+// ===============================
+//       PRODUITS DU SALON
+// ===============================
 const productsData = {
   1: [
     { name: "Coiffure 1", price: "$18.25", desc: "Lorem ipsum dolor sit amet.", img: "/static/assets/images/product_01.jpg", reviews: 12, category: "des" },
@@ -214,27 +271,26 @@ const productsData = {
   ]
 };
 
-// ======= Remplir dynamiquement le select =======
-(function fillSelect() {
+// ===============================
+//   REMPLIR SELECT COIFFURES
+// ===============================
+(function fillProducts() {
   if (!productSelect) return;
   productSelect.innerHTML = `<option value="">-- Sélectionnez une coiffure --</option>`;
   Object.values(productsData).flat().forEach(prod => {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = prod.name;
     option.textContent = prod.name;
     productSelect.appendChild(option);
   });
 })();
 
-// ======= Affichage produits =======
+// ===============================
+//       AFFICHAGE PRODUITS
+// ===============================
 function showProducts(products) {
   if (!productGrid) return;
   productGrid.innerHTML = "";
-  if (!products || products.length === 0) {
-    productGrid.innerHTML = `<p style="padding:20px;">Aucun produit disponible pour cette page pour l'instant.</p>`;
-    return;
-  }
-
   products.forEach(prod => {
     const div = document.createElement("div");
     div.className = `col-lg-4 col-md-4 all ${prod.category}`;
@@ -253,7 +309,9 @@ function showProducts(products) {
             <li><i class="fa fa-star"></i></li>
           </ul>
           <span>Reviews (${prod.reviews})</span>
-          <button class="btn btn-primary btn-sm reserve-btn" data-product="${prod.name}">Réserver</button>
+          <button class="btn btn-primary btn-sm reserve-btn" data-product="${prod.name}">
+            Réserver
+          </button>
         </div>
       </div>
     `;
@@ -261,16 +319,10 @@ function showProducts(products) {
   });
 }
 
-// ======= Pagination =======
+// ===============================
+//          PAGINATION
+// ===============================
 let currentPage = 1;
-
-function setActivePage(pageNum) {
-  if (!pagination) return;
-  pagination.querySelectorAll("li").forEach(li => li.classList.remove("active"));
-  const link = pagination.querySelector(`a[data-page='${pageNum}']`);
-  if (link) link.parentElement.classList.add("active");
-}
-
 function initPagination() {
   if (!pagination) return;
   pagination.querySelectorAll("a").forEach(link => {
@@ -285,48 +337,81 @@ function initPagination() {
     });
   });
 }
-
-// Initialisation
+function setActivePage(pageNum) {
+  if (!pagination) return;
+  pagination.querySelectorAll("li").forEach(li => li.classList.remove("active"));
+  const link = pagination.querySelector(`a[data-page='${pageNum}']`);
+  if (link) link.parentElement.classList.add("active");
+}
 showProducts(productsData[currentPage]);
 setActivePage(currentPage);
 initPagination();
 
-// ======= Réserver via bouton produit =======
-if (productGrid && reservationForm) {
-  productGrid.addEventListener('click', function(e) {
-    if (e.target && e.target.classList.contains('reserve-btn')) {
-      const productName = e.target.getAttribute('data-product');
-      productSelect.value = productName;
-      reservationForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+// ===============================
+//   AUTO-REMPLIR COIFFURE
+// ===============================
+productGrid.addEventListener("click", e => {
+  if (e.target.classList.contains("reserve-btn")) {
+    productSelect.value = e.target.dataset.product;
+    reservationForm.scrollIntoView({ behavior: "smooth" });
+  }
+});
+
+// ===============================
+//    GÉNÉRER CRÉNEAUX HORAIRES
+// ===============================
+function refreshTimeSlots() {
+  if (!timeSelect) return;
+  timeSelect.innerHTML = `<option value="">-- Choisissez une heure --</option>`;
+  OPENING_SLOTS.forEach(slot => {
+    const o = document.createElement("option");
+    o.value = slot;
+    o.textContent = slot;
+    timeSelect.appendChild(o);
   });
 }
+refreshTimeSlots();
 
-// ======= Réservation fetch + alert =======
-if (reservationForm) {
-  reservationForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    const formData = new FormData(reservationForm);
+// ===============================
+//  INTERDICTION DIMANCHE + PASSÉ
+// ===============================
+dateInput.addEventListener("change", () => {
+  const selected = new Date(dateInput.value);
+  const today = new Date();
+  selected.setHours(0,0,0,0); today.setHours(0,0,0,0);
 
-    fetch('/book-json', {
-      method: 'POST',
-      body: formData
-    })
+  if (selected < today) {
+    alert("❌ Impossible de réserver une date passée.");
+    dateInput.value = "";
+    return;
+  }
+  if (selected.getDay() === CLOSED_DAY) {
+    alert("❌ Le salon est fermé le dimanche.");
+    dateInput.value = "";
+    return;
+  }
+});
+
+// ===============================
+//      ENVOI FORMULAIRE
+// ===============================
+reservationForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const formData = new FormData(reservationForm);
+
+  fetch("/book", { method: "POST", body: formData })
     .then(res => res.json())
     .then(data => {
-      alert(data.message);
-      reservationForm.reset();
+      if (!data.success) alert("❌ " + data.error);
+      else {
+        alert("✅ " + data.message);
+        reservationForm.reset();
+        refreshTimeSlots();
+      }
     })
-    .catch(err => {
-      alert("Erreur lors de l'envoi de la réservation ❌");
-      console.error(err);
-    });
-  });
-}
+    .catch(err => { console.error(err); alert("Erreur lors de la réservation ❌"); });
+});
 </script>
-
-
-
 
 
 
@@ -352,52 +437,183 @@ if (reservationForm) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- ***** Footer Start ***** -->
-<footer style="background-color:#343a40; color:#fff; padding:60px 0; font-size:14px;">
+<footer class="footer">
   <div class="container">
     <div class="row">
+
       <!-- About -->
-      <div class="col-md-4">
-        <h5 style="color:#f8c846;">KAREN BRAIDS</h5>
+      <div class="col-md-4 footer-about">
+        <h5>KAREN BRAIDS</h5>
         <p>Votre salon de coiffure préféré, offrant les meilleurs styles et services avec passion et professionnalisme.</p>
       </div>
 
       <!-- Quick Links -->
-      <div class="col-md-4">
-        <h5 style="color:#f8c846;">Liens rapides</h5>
-        <ul style="list-style:none; padding:0;">
-          <li><a href="/" style="color:#fff; text-decoration:none;">Accueil</a></li>
-          <li><a href="/products" style="color:#fff; text-decoration:none;">Nos Produits</a></li>
-          <li><a href="/about" style="color:#fff; text-decoration:none;">À propos</a></li>
-          <li><a href="/contact" style="color:#fff; text-decoration:none;">Contact</a></li>
+      <div class="col-md-4 footer-links">
+        <h5>Liens rapides</h5>
+        <ul>
+          <li><a href="/">Accueil</a></li>
+          <li><a href="/products">Nos Produits</a></li>
+          <li><a href="/about">À propos</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
       </div>
 
       <!-- Contact Info -->
-      <div class="col-md-4">
-        <h5 style="color:#f8c846;">Contact</h5>
+      <div class="col-md-4 footer-contact">
+        <h5>Contact</h5>
         <p><i class="fa fa-map-marker-alt"></i> 123 Rue de la Beauté, Cotonou, Bénin</p>
         <p><i class="fa fa-phone"></i> +229 97 45 45 54</p>
         <p><i class="fa fa-envelope"></i> contact@karenbraids.com</p>
       </div>
+
     </div>
 
-    <hr style="border-top:1px solid #555; margin:20px 0;">
+    <hr>
 
-    <div class="row">
+    <div class="row footer-bottom">
       <div class="col-md-6">
         <p>&copy; 2025 KAREN BRAIDS. Tous droits réservés.</p>
       </div>
-      <div class="col-md-6 text-md-right">
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-instagram"></i></a>
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-twitter"></i></a>
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-whatsapp"></i></a>
+      <div class="col-md-6 social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-whatsapp"></i></a>
       </div>
     </div>
   </div>
 </footer>
 <!-- ***** Footer End ***** -->
+
+<style>
+/* ===== Footer Styling ===== */
+.footer {
+  background: linear-gradient(135deg, #343a40, #212529);
+  color: #fff;
+  padding: 60px 0 30px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer h5 {
+  color: #f8c846;
+  font-size: 18px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.footer h5::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 2px;
+  background: #f8c846;
+  left: 0;
+  bottom: -8px;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.footer h5:hover::after {
+  width: 100%;
+}
+
+.footer p, .footer ul li, .footer a {
+  color: #ddd;
+  text-decoration: none;
+}
+
+.footer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer ul li {
+  margin-bottom: 10px;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.footer ul li:hover {
+  transform: translateX(5px);
+}
+
+.footer-bottom {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.social-icons a {
+  color: #fff;
+  margin: 0 8px;
+  display: inline-block;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: #f8c846;
+  transform: scale(1.2) rotate(-10deg);
+}
+
+/* Subtle floating animation for background */
+.footer::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgba(248, 200, 70, 0.1), transparent 70%);
+  top: -50%;
+  left: -50%;
+  animation: float 20s linear infinite;
+  z-index: 0;
+}
+
+@keyframes float {
+  0% { transform: rotate(0deg) translateX(0); }
+  50% { transform: rotate(180deg) translateX(50px); }
+  100% { transform: rotate(360deg) translateX(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+  .footer-bottom p {
+    margin-bottom: 10px;
+  }
+  .social-icons {
+    margin-top: 10px;
+  }
+}
+</style>
+
+
+
+
 
 
 

@@ -5,54 +5,58 @@ from fastapi.responses import HTMLResponse, JSONResponse
 import csv
 import os
 from typing import Optional
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+import sqlite3
+import datetime
 
+
+
+
+
+
+
+
+
+# -------------------- LOAD ENV --------------------
+load_dotenv()
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+DEST_EMAIL = os.getenv("DEST_EMAIL")  # Email admin
+
+# -------------------- FASTAPI INIT --------------------
 app = FastAPI()
-
-# --------------------
-# TEMPLATES & STATIC
-# --------------------
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+DB_PATH = "database.db"
 
-# --------------------
-# CSV CONFIG
-# --------------------
-CSV_FILE = "reservations.csv"
+# -------------------- EMAIL UTIL --------------------
+def send_email(to_email: str, subject: str, body: str):
+    msg = MIMEMultipart()
+    msg["From"] = EMAIL_USER
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "plain"))
 
-# Crée le fichier CSV s'il n'existe pas et ajoute l'entête
-if not os.path.exists(CSV_FILE):
-    with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["Nom", "Téléphone", "Coiffure", "Date"])
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(EMAIL_USER, EMAIL_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        print(f"Email envoyé à {to_email} ✅")
+    except Exception as e:
+        print("Erreur envoi email:", e)
 
-# --------------------
-# UTIL: simulation d'envoi d'email (pour tests)
-# --------------------
-def send_email_simulation(name: str, phone: str, hairstyle: str, date: str, dest_email: str = "contact@karenbraids.com"):
-    """
-    Simule l'envoi d'un e-mail : affiche dans la console le message que
-    nous enverrions en production. Utile pour tester sans envoyer d'e-mails réels.
-    """
-    print("\n=== Simulation d'envoi d'email ===")
-    print(f"À      : {dest_email}")
-    print(f"Sujet  : Nouvelle réservation — {hairstyle}")
-    print("Contenu:")
-    print(f"  Nom     : {name}")
-    print(f"  Téléphone: {phone}")
-    print(f"  Coiffure : {hairstyle}")
-    print(f"  Date     : {date}")
-    print("=== Fin du mail simulé ===\n")
-
-# --------------------
-# ROUTES PAGES
-# --------------------
+# -------------------- STATIC PAGES --------------------
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/products", response_class=HTMLResponse)
-async def products(request: Request, message: Optional[str] = None):
-    # Si tu veux afficher message côté template, passe 'message' (utilisé si tu retournes TemplateResponse)
+async def products(request: Request, message: str | None = None):
     return templates.TemplateResponse("products.html", {"request": request, "message": message})
 
 @app.get("/about", response_class=HTMLResponse)
@@ -60,73 +64,121 @@ async def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request})
 
 @app.get("/contact", response_class=HTMLResponse)
-async def contact(request: Request):
+async def contact_page(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
 
-# --------------------
-# ENDPOINTS RÉSERVATION
-# --------------------
+# -------------------- UTIL CHECK SLOT --------------------
+def slot_taken(date: str, time: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM reservations WHERE date = ? AND time = ?", (date, time))
+    exists = cur.fetchone() is not None
+    conn.close()
+    return exists
 
-# 1) endpoint classique HTML (souvent pour redirection HTML)
-@app.post("/book", response_class=HTMLResponse)
+# -------------------- VALID HOURS --------------------
+WORK_HOURS = ["08:00", "09:00", "10:00", "11:00", "15:00", "16:00", "17:00"]
+
+def valid_time(time: str) -> bool:
+    return time in WORK_HOURS
+
+# -------------------- RESERVATION --------------------
+@app.post("/book")
 async def book(
     request: Request,
     name: str = Form(...),
     phone: str = Form(...),
+    email: str = Form(...),
     hairstyle: str = Form(...),
-    date: str = Form(...)
+    date: str = Form(...),
+    time: str = Form(...)
 ):
-    # Sauvegarde dans CSV
-    with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([name, phone, hairstyle, date])
-
-    # Simulation d'envoi d'email (print dans la console)
-    send_email_simulation(name, phone, hairstyle, date)
-
-    # On peut renvoyer un TemplateResponse avec un message si tu veux
-    message = f"Réservation pour {hairstyle} envoyée ✅"
-    return templates.TemplateResponse("products.html", {"request": request, "message": message})
-
-# 2) endpoint JSON pour fetch (JS)
-@app.post("/book-json")
-async def book_json(
-    name: str = Form(...),
-    phone: str = Form(...),
-    hairstyle: str = Form(...),
-    date: str = Form(...)
-):
-    # Sauvegarde dans CSV
-    with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([name, phone, hairstyle, date])
-
-    # Simulation d'envoi d'email (print dans la console)
-    send_email_simulation(name, phone, hairstyle, date)
-
-    # Renvoie JSON pour que le fetch côté client affiche le message
-    return JSONResponse({"message": f"Réservation pour {hairstyle} envoyée ✅"})
+    
 
 
 
 
-CONTACT_CSV = "messages.csv"
-# Crée le fichier si inexistant
-import os
-if not os.path.exists(CONTACT_CSV):
-    with open(CONTACT_CSV, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["Nom", "Email", "Sujet", "Message"])
+    # Vérification date passée
+    today = datetime.date.today()
+    try:
+        reservation_date = datetime.date.fromisoformat(date)
+    except ValueError:
+        return JSONResponse({"success": False, "error": "Format de date invalide. Utilisez AAAA-MM-JJ."})
 
-@app.post("/contact")
-async def contact_form(
+    if reservation_date < today:
+        return JSONResponse({"success": False, "error": "Impossible de réserver une date passée."})
+
+
+
+
+
+    # Vérification horaire valide
+    if not valid_time(time):
+        return JSONResponse({"success": False, "error": "Horaire invalide. Choisissez un créneau valide."})
+
+    # Vérification si slot déjà pris
+    if slot_taken(date, time):
+        return JSONResponse({"success": False, "error": f"Le créneau {date} {time} est déjà réservé."})
+
+    # Enregistrement réservation
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO reservations (name, phone, email, hairstyle, date, time)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (name, phone, email, hairstyle, date, time))
+    conn.commit()
+    conn.close()
+
+    # Email admin
+    send_email(
+        DEST_EMAIL,
+        f"Nouvelle réservation — {hairstyle}",
+        f"""
+Nouvelle réservation :
+Nom : {name}
+Téléphone : {phone}
+Coiffure : {hairstyle}
+Date : {date}
+Heure : {time}
+Email : {email}
+"""
+    )
+
+    # Email client
+    send_email(
+        email,
+        "Confirmation de réservation",
+        f"""
+Bonjour {name},
+
+Votre réservation pour '{hairstyle}' le {date} à {time} a bien été confirmée ! ✅
+
+Merci pour votre confiance.
+"""
+    )
+
+    return JSONResponse({"success": True, "message": "Réservation confirmée !"})
+
+# -------------------- CONTACT FORM --------------------
+@app.post("/send-message", response_class=HTMLResponse)
+def send_message(
     request: Request,
     name: str = Form(...),
     email: str = Form(...),
     subject: str = Form(...),
     message: str = Form(...)
 ):
-    with open(CONTACT_CSV, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([name, email, subject, message])
-    return templates.TemplateResponse("contact.html", {"request": request, "success": "Message envoyé ✅"})
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO messages (name, email, subject, message)
+        VALUES (?, ?, ?, ?)
+    """, (name, email, subject, message))
+    conn.commit()
+    conn.close()
+
+    return templates.TemplateResponse(
+        "contact.html",
+        {"request": request, "success": "Votre message a été envoyé avec succès !"}
+    )

@@ -1,14 +1,26 @@
-# Ignorer l'environnement virtuel
+# Environnement virtuel
 venv/
 
-# Ignorer les fichiers pycache
+# Pycache
 __pycache__/
 *.pyc
 
-# Ignorer les fichiers temporaires
+# Fichiers temporaires / logs
 *.log
-*.env
 
-# Ignorer les fichiers système
+# Variables d'environnement
+.env
+
+# Bases de données locales
+database.db
+
+# Fichiers CSV temporaires
+*.csv
+
+# IDE / éditeurs
+.vscode/
+.idea/
+
+# Fichiers système
 .DS_Store
 Thumbs.db

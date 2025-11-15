@@ -376,52 +376,186 @@ https://templatemo.com/tm-546-sixteen-clothing
 <hr style="border:1px solid #ccc; margin:40px 0;">
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- ***** Footer Start ***** -->
-<footer style="background-color:#343a40; color:#fff; padding:60px 0; font-size:14px;">
+<footer class="footer">
   <div class="container">
     <div class="row">
+
       <!-- About -->
-      <div class="col-md-4">
-        <h5 style="color:#f8c846;">KAREN BRAIDS</h5>
+      <div class="col-md-4 footer-about">
+        <h5>KAREN BRAIDS</h5>
         <p>Votre salon de coiffure préféré, offrant les meilleurs styles et services avec passion et professionnalisme.</p>
       </div>
 
       <!-- Quick Links -->
-      <div class="col-md-4">
-        <h5 style="color:#f8c846;">Liens rapides</h5>
-        <ul style="list-style:none; padding:0;">
-          <li><a href="/" style="color:#fff; text-decoration:none;">Accueil</a></li>
-          <li><a href="/products" style="color:#fff; text-decoration:none;">Nos Produits</a></li>
-          <li><a href="/about" style="color:#fff; text-decoration:none;">À propos</a></li>
-          <li><a href="/contact" style="color:#fff; text-decoration:none;">Contact</a></li>
+      <div class="col-md-4 footer-links">
+        <h5>Liens rapides</h5>
+        <ul>
+          <li><a href="/">Accueil</a></li>
+          <li><a href="/products">Nos Produits</a></li>
+          <li><a href="/about">À propos</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
       </div>
 
       <!-- Contact Info -->
-      <div class="col-md-4">
-        <h5 style="color:#f8c846;">Contact</h5>
+      <div class="col-md-4 footer-contact">
+        <h5>Contact</h5>
         <p><i class="fa fa-map-marker-alt"></i> 123 Rue de la Beauté, Cotonou, Bénin</p>
         <p><i class="fa fa-phone"></i> +229 97 45 45 54</p>
         <p><i class="fa fa-envelope"></i> contact@karenbraids.com</p>
       </div>
+
     </div>
 
-    <hr style="border-top:1px solid #555; margin:20px 0;">
+    <hr>
 
-    <div class="row">
+    <div class="row footer-bottom">
       <div class="col-md-6">
         <p>&copy; 2025 KAREN BRAIDS. Tous droits réservés.</p>
       </div>
-      <div class="col-md-6 text-md-right">
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-instagram"></i></a>
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-twitter"></i></a>
-        <a href="#" style="color:#fff; margin:0 5px;"><i class="fab fa-whatsapp"></i></a>
+      <div class="col-md-6 social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-whatsapp"></i></a>
       </div>
     </div>
   </div>
 </footer>
 <!-- ***** Footer End ***** -->
+
+<style>
+/* ===== Footer Styling ===== */
+.footer {
+  background: linear-gradient(135deg, #343a40, #212529);
+  color: #fff;
+  padding: 60px 0 30px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer h5 {
+  color: #f8c846;
+  font-size: 18px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.footer h5::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 2px;
+  background: #f8c846;
+  left: 0;
+  bottom: -8px;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.footer h5:hover::after {
+  width: 100%;
+}
+
+.footer p, .footer ul li, .footer a {
+  color: #ddd;
+  text-decoration: none;
+}
+
+.footer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer ul li {
+  margin-bottom: 10px;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.footer ul li:hover {
+  transform: translateX(5px);
+}
+
+.footer-bottom {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.social-icons a {
+  color: #fff;
+  margin: 0 8px;
+  display: inline-block;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: #f8c846;
+  transform: scale(1.2) rotate(-10deg);
+}
+
+/* Subtle floating animation for background */
+.footer::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgba(248, 200, 70, 0.1), transparent 70%);
+  top: -50%;
+  left: -50%;
+  animation: float 20s linear infinite;
+  z-index: 0;
+}
+
+@keyframes float {
+  0% { transform: rotate(0deg) translateX(0); }
+  50% { transform: rotate(180deg) translateX(50px); }
+  100% { transform: rotate(360deg) translateX(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+  .footer-bottom p {
+    margin-bottom: 10px;
+  }
+  .social-icons {
+    margin-top: 10px;
+  }
+}
+</style>
+
+
+
+
+
+
+
 
 
 
